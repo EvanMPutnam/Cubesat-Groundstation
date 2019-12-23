@@ -55,7 +55,7 @@ def update_data(request):
 
 
 #######################################################
-#   Description:    Update a dataref on the screen.
+#   Description:    Create a dataref.
 #
 #######################################################
 @csrf_exempt
