@@ -18,13 +18,6 @@ Steps to add new view:
     3) Create function and do any logic you need
 '''
 
-'''
-Steps TODO
-    1) Create model.
-        - Have model be able to handle different types of data/displays
-    2) Have HTML parse the display OBJ and display the data.
-        - Have an ajax method that queries the database and updates everything
-'''
 
 
 #######################################################
@@ -43,7 +36,10 @@ def index_view(request):
 #######################################################
 def template_example(request):
     title = "Hello Template!"
-    return render(request, 'master_view/base.html', {'title':title})
+    data_refs = Dataref.objects.filter(data_ref_project="Project_1")
+    for data_ref in data_refs:
+        data_ref.json_data = json.loads(data_ref.json_data)
+    return render(request, 'master_view/base.html', {'title':title, "data_refs": data_refs})
 
 
 #######################################################
@@ -52,6 +48,31 @@ def template_example(request):
 #######################################################
 def update_data(request):
     pass
+
+
+@csrf_exempt
+#######################################################
+#   Description:     Get the information relevant to 
+#                    a dataref.
+#
+#######################################################
+def get_dataref(request):
+    if request.method == 'GET':
+        try:
+            data_ref_project = request.GET['data_ref_project']
+            data_ref_name = request.GET['data_ref_name']
+            dataref = Dataref.objects.filter(data_ref_project=data_ref_project, data_ref_name=data_ref_name)[0]
+            json_data = json.loads(dataref.json_data)
+            status_r = {'status': 'Success', 'dataref': json_data, 'type_of_data': dataref.type_of_data}
+            return JsonResponse(status_r)
+        except Exception as e:
+            status_r = {'status':'ERROR -> ' + str(e)}
+            return JsonResponse(status_r)
+    else:
+        status_r = {'status': 'Error'}
+        return JsonResponse(status_r)
+
+
 
 
 #######################################################
