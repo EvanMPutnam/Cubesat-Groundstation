@@ -109,8 +109,8 @@ body {
               <script>
                 //Update the datarefs here
                 update_data_ref("{{item.data_ref_name}}", "{{item.data_ref_project.project_name}}");
-                //Timer to update datarefs
-                setInterval(update_data_ref, SECONDS_TO_UPDATE, "{{item.data_ref_name}}", "{{item.data_ref_project.project_name}}")
+                //Timer to update datarefs (Based on refresh_time field).
+                setInterval(update_data_ref, parseInt("{{item.refresh_time}}")*1000, "{{item.data_ref_name}}", "{{item.data_ref_project.project_name}}")
               </script>
             {% endfor %}
         </div>

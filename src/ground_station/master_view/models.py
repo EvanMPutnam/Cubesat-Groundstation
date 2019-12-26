@@ -24,6 +24,7 @@ class Dataref(models.Model):
     json_data = models.TextField()
     order_weight = models.IntegerField(default=1)
     type_of_data = models.CharField(choices=TYPE_OF_DATA, default=INT, max_length=11)
+    refresh_time = models.PositiveIntegerField(default=10)
 
     class Meta:
         unique_together = (('data_ref_name', 'data_ref_project'))

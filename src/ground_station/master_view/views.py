@@ -77,6 +77,7 @@ def get_dataref(request):
 
 #######################################################
 #   Description:    Create a dataref.
+#                       TODO: Add refresh_time
 #
 #######################################################
 @csrf_exempt
@@ -92,9 +93,11 @@ def create_dataref(request):
             project = Project.objects.filter(project_name=project)[0]
             json_data = data['json_data']
             order_weight = data['order_weight']
+            refresh_time = data['refresh_time']
             #Create object and save!
             data_ref_obj = Dataref(data_ref_name=name, data_ref_project=project, 
-                                    json_data=json_data, order_weight=order_weight)
+                                    json_data=json_data, order_weight=order_weight,
+                                    refresh_time=refresh_time)
             data_ref_obj.save()
             print("Success in creating dataref.")
             return JsonResponse(status_r)
