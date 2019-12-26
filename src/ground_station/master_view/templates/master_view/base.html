@@ -9,6 +9,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 <style>
 body {
@@ -68,11 +69,13 @@ body {
   //TODO: 1) Add a parameter for seconds to update
           2) Add a graph view.
           3) Add ability to switch between projects
+          4) Add appropriate constants
   **/
 
   //Update every ten seconds.
   var SECONDS_TO_UPDATE = 10 * 1000;
   var GET_DATA_REF_URL = "{{request.path}}get_dataref";
+  google.charts.load('current', {'packages':['line']});
 
   //Create functions to call here
   function update_data_ref(data_ref_name, data_ref_project){
@@ -84,17 +87,51 @@ body {
       url: GET_DATA_REF_URL,
       data: {data_ref_name: data_ref_name, data_ref_project: data_ref_project},
       dataType: 'json',
-      success: function (data) {
+      success: function (dat) {
         //Here you process any new data
-        var d = data;
+        var d = dat;
         var element = document.getElementById(data_ref_name);
-        var newHtml = '<h5 class="card-title">' + data_ref_name + '</h5>' +'<p class="card-text">'+ d['dataref']['data_val'] +'</p>';
-        element.innerHTML = newHtml;
+        console.log(d['type_of_display'])
+        if (d['type_of_display'] == "Raw_Display"){
+          console.log("Raw data display")
+          var newHtml = '<h5 class="card-title">' + 
+                        data_ref_name + 
+                        '</h5>' +'<p class="card-text">'+ 
+                        d['dataref']['data_val'] +'</p>';
+          element.innerHTML = newHtml;
+        } else { 
+
+          console.log('Graph data display')
+          
+          var data = new google.visualization.DataTable();
+          data.addColumn('number', 'Index');
+          data.addColumn('number', '');
+
+          var data_arr = [];
+          var count = 1;
+          d['dataref']['data_val'].forEach(element => {
+            data_arr.push([count, element]);
+            count += 1;
+          });
+
+          data.addRows(data_arr);
+
+          var options = {
+            chart: {
+              title: data_ref_name,
+              subtitle: ''
+            },
+            width: '100%'
+          };
+
+          document.getElementById(data_ref_name).className = 'card-img-top';
+          var chart = new google.charts.Line(document.getElementById(data_ref_name));
+          chart.draw(data, google.charts.Line.convertOptions(options));
+
+        }
       }
     });
     console.log(" ")
-
-
   }
 </script>
 
@@ -107,8 +144,8 @@ body {
               </div>
 
               <script>
-                //Update the datarefs here
-                update_data_ref("{{item.data_ref_name}}", "{{item.data_ref_project.project_name}}");
+                //Update the datarefs but wait for content to load.
+                setTimeout(update_data_ref, 500, "{{item.data_ref_name}}", "{{item.data_ref_project.project_name}}")
                 //Timer to update datarefs (Based on refresh_time field).
                 setInterval(update_data_ref, parseInt("{{item.refresh_time}}")*1000, "{{item.data_ref_name}}", "{{item.data_ref_project.project_name}}")
               </script>

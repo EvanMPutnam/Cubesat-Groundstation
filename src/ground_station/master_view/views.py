@@ -63,7 +63,9 @@ def get_dataref(request):
             data_ref_name = request.GET['data_ref_name']
             dataref = Dataref.objects.filter(data_ref_project=data_ref_project, data_ref_name=data_ref_name)[0]
             json_data = json.loads(dataref.json_data)
-            status_r = {'status': 'Success', 'dataref': json_data, 'type_of_data': dataref.type_of_data}
+            status_r = {'status': 'Success', 'dataref': json_data, 
+                        'type_of_data': dataref.type_of_data,
+                        'type_of_display': dataref.type_of_display}
             return JsonResponse(status_r)
         except Exception as e:
             status_r = {'status':'ERROR -> ' + str(e)}
