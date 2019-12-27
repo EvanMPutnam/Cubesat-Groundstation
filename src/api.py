@@ -52,9 +52,9 @@ def stress_test(data_ref_name, data_ref_proejct, append_value):
     
     data = {name: data_ref_name, 
             project: data_ref_proejct, 
-            data_val: append_value
+            data_val: append_value,
             modification: "REPLACE"}
-            
+
     r = requests.get(src, params=data)
     print(r.content)
 
