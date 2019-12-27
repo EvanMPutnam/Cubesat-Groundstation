@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.http import QueryDict
 from django.http import JsonResponse
 
@@ -7,7 +7,6 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from master_view.models import Dataref
 from master_view.models import Project
-
 
 import json
 
@@ -31,27 +30,38 @@ def index_view(request):
 
 
 #######################################################
-#   Description:    Example of a template
+#   Description:    This is the main entry point for
+#                   a dashboard.
 #
 #######################################################
 def template_example(request, project_name=None):
-    print(request.path)
     title = "Data View"
 
+    #Get all projects to display in sidebar
     projects = Project.objects.all()
 
+    #Get relevant datarefs for a given project
     data_refs = None
     if project_name != None:
+        #Replace request path with base path.
         request.path = request.path.split("/")[0]
+        #Get datarefs of project
         data_refs = Dataref.objects.filter(data_ref_project=project_name)
-        print(data_refs)
+        #If that project has no datarefs or does not exist.
         if data_refs == None or len(data_refs) == 0:
-            raise Http404("Project does not exist")
+            raise Http404("Project does not exist or no datarefs created.")
     else:
-        data_refs = Dataref.objects.filter(data_ref_project=projects[0].project_name)
+        #Assumes at least one project exists.
+        try:
+            data_refs = Dataref.objects.filter(data_ref_project=projects[0].project_name)
+        except:
+            return HttpResponseNotFound('<h1>No projects currently exist.  Please create one in admin panel.</h1>')
     
+    #Get json data for each data ref.
     for data_ref in data_refs:
         data_ref.json_data = json.loads(data_ref.json_data)
+
+    #Render the template with relevant data
     return render(request, 'master_view/base.html', {'title':title, "data_refs": data_refs, "projects": projects})
 
 
