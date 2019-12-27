@@ -4,7 +4,8 @@ from . import views
 
 urlpatterns = [
     path("/", views.template_example),
-    path("/create_dataref", views.create_dataref),
-    path("/create_project", views.create_project),
-    path("/get_dataref", views.get_dataref)
+    path('/<project_name>', views.template_example),
+    path("/api/create_dataref", views.create_dataref),
+    path("/api/create_project", views.create_project),
+    path("/api/get_dataref", views.get_dataref)
 ]

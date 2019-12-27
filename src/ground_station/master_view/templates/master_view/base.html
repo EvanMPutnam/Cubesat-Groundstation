@@ -55,10 +55,9 @@ body {
 <body>
 
 <div class="sidenav">
-    <a href="#about">About</a>
-    <a href="#services">Services</a>
-    <a href="#clients">Clients</a>
-    <a href="#contact">Contact</a>
+    {% for item in projects %}
+    <a href="{{request.path}}{{item.project_name}}">{{item.project_name}}</a>
+    {% endfor %}
 </div>
 
 <script>
@@ -66,16 +65,19 @@ body {
   In the future may want to update ALL datarefs at once.
   OR at least provide the option.  For now though this is fine.
 
-  //TODO: 1) Add a parameter for seconds to update
-          2) Add a graph view.
-          3) Add ability to switch between projects
-          4) Add appropriate constants
+  //TODO: 1) Add a parameter for seconds to update    DONE
+          2) Add a graph view.                        DONE
+          3) Add ability to switch between projects   IN_PROGRESS
+          4) Add appropriate constants                IN_PROGRESS
   **/
 
   //Update every ten seconds.
   var SECONDS_TO_UPDATE = 10 * 1000;
-  var GET_DATA_REF_URL = "{{request.path}}get_dataref";
+  var GET_DATA_REF_URL = "{{request.path}}api/get_dataref";
   google.charts.load('current', {'packages':['line']});
+
+  //Keeps track of each chart present in project view.
+  var global_charts = {}
 
   //Create functions to call here
   function update_data_ref(data_ref_name, data_ref_project){
@@ -88,25 +90,27 @@ body {
       data: {data_ref_name: data_ref_name, data_ref_project: data_ref_project},
       dataType: 'json',
       success: function (dat) {
-        //Here you process any new data
+        //
         var d = dat;
         var element = document.getElementById(data_ref_name);
+
         console.log(d['type_of_display'])
+        //If you just want the raw data
         if (d['type_of_display'] == "Raw_Display"){
           console.log("Raw data display")
+          //HTML for just simple text.  Can possibly configure this later.
           var newHtml = '<h5 class="card-title">' + 
                         data_ref_name + 
                         '</h5>' +'<p class="card-text">'+ 
                         d['dataref']['data_val'] +'</p>';
+          //Set inner html to card.
           element.innerHTML = newHtml;
+        //Else a simple chart view
         } else { 
 
-          console.log('Graph data display')
-          
-          var data = new google.visualization.DataTable();
-          data.addColumn('number', 'Index');
-          data.addColumn('number', '');
+          console.log('Graph data display');
 
+          //Format data appropriately.
           var data_arr = [];
           var count = 1;
           d['dataref']['data_val'].forEach(element => {
@@ -114,8 +118,13 @@ body {
             count += 1;
           });
 
+          //Create new data table for chart.
+          var data = new google.visualization.DataTable();
+          data.addColumn('number', 'Index');
+          data.addColumn('number', '');
           data.addRows(data_arr);
 
+          //Parameters for chart
           var options = {
             chart: {
               title: data_ref_name,
@@ -124,8 +133,22 @@ body {
             width: '100%'
           };
 
+          //Change class to card-img-top
           document.getElementById(data_ref_name).className = 'card-img-top';
-          var chart = new google.charts.Line(document.getElementById(data_ref_name));
+          
+          //Create null chart object to then find.
+          var chart = null;
+
+          //If chart already exists then grab it.
+          if (data_ref_name in global_charts) {
+            chart = global_charts[data_ref_name];
+          //Else if chart does not exist create it.
+          } else {
+            chart = new google.charts.Line(document.getElementById(data_ref_name));
+            global_charts[data_ref_name] = chart;
+          }
+
+          //Draw chart data to display.
           chart.draw(data, google.charts.Line.convertOptions(options));
 
         }
