@@ -39,8 +39,26 @@ def create_project(project_name):
     r = requests.post(src, json=data)
     print(r.content)
 
+
+import requests
+
+def stress_test(data_ref_name, data_ref_proejct, append_value):
+    src = "http://127.0.0.1:8000/master_view/api/append_data_to_array_maintain"
+    name = 'data_ref_name'
+    project = 'data_ref_project'
+    data_val = 'data_val'
+    modification = 'modification'
+    
+    
+    data = {name: data_ref_name, 
+            project: data_ref_proejct, 
+            data_val: append_value
+            modification: "REPLACE"}
+            
+    r = requests.get(src, params=data)
+    print(r.content)
+
+
+# Create your tests here.
 if __name__ == "__main__":
-    create_project("Project Test 2")
-    #Creates a
-    create_dataref("hello_data", "Project Test 2", 
-                    2, r"{Hello: 1, name:'Hello World'}")
+    stress_test('Altitude Data','Project_1', 20)

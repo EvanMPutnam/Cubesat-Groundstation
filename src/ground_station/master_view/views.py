@@ -28,6 +28,49 @@ def index_view(request):
 
 
 
+#Appends to array but pops off the first element.
+@csrf_exempt
+def modify_data(request):
+    #Default messages
+    success_message = {'status': 'Success'}
+    error_message = {'status': 'Error'}
+
+    #Handle a request to update an int/double
+    if request.method == "GET":
+        #Get required data from datarefs.
+        print(request.body)
+        dataref = request.GET['data_ref_name']
+        project = request.GET['data_ref_project']
+        data_to_add = request.GET['data_val']
+
+        #Get dataref here.
+        data_ref = Dataref.objects.filter(data_ref_project=project, data_ref_name=dataref)[0]
+
+        #Check if array to append.
+        if data_ref.type_of_data == "Integer_Arr":
+            json_data = json.loads(data_ref.json_data)
+            data_arr = json_data['data_val']
+            data_arr.pop(0)
+            data_arr.append(int(data_to_add))
+            save_back = "{\"data_val\":" + str(data_arr) + r"}"
+            data_ref.json_data = save_back
+            data_ref.save()
+        elif data_ref.type_of_data == "Double_Arr":
+            json_data = json.loads(data_ref.json_data)
+            data_arr = json_data['data_val']
+            data_arr.pop(0)
+            data_arr.append(float(data_to_add))
+            save_back = "{\"data_val\":" + str(data_arr) + r"}"
+            data_ref.json_data = save_back
+            data_ref.save()
+
+        print(data_ref.json_data)
+        
+        return JsonResponse(success_message)
+       
+    else:
+        return JsonResponse(error_message)
+
 
 #######################################################
 #   Description:    This is the main entry point for
