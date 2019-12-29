@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, Http404, HttpResponseBadRequest
+from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseNotFound
 from django.http import QueryDict
 from django.http import JsonResponse
 
@@ -9,6 +9,8 @@ from master_view.models import Dataref
 from master_view.models import Project
 
 import json
+
+from . import utils
 
 '''
 Steps to add new view:
@@ -42,30 +44,51 @@ def modify_data(request):
         dataref = request.GET['data_ref_name']
         project = request.GET['data_ref_project']
         data_to_add = request.GET['data_val']
+        modification = request.GET['modification']
 
         #Get dataref here.
-        data_ref = Dataref.objects.filter(data_ref_project=project, data_ref_name=dataref)[0]
+        try:
+            data_ref = Dataref.objects.filter(data_ref_project=project,
+                                             data_ref_name=dataref)[0]
+        except IndexError:
+            error_message = {'status': 'Error -> Data ref does not exist for project '
+                                + str(project) + " at dataref " + str(dataref)}
+            return JsonResponse(error_message)
 
-        #Check if array to append.
-        if data_ref.type_of_data == "Integer_Arr":
-            json_data = json.loads(data_ref.json_data)
-            data_arr = json_data['data_val']
-            data_arr.pop(0)
-            data_arr.append(int(data_to_add))
-            save_back = "{\"data_val\":" + str(data_arr) + r"}"
-            data_ref.json_data = save_back
-            data_ref.save()
-        elif data_ref.type_of_data == "Double_Arr":
-            json_data = json.loads(data_ref.json_data)
-            data_arr = json_data['data_val']
-            data_arr.pop(0)
-            data_arr.append(float(data_to_add))
-            save_back = "{\"data_val\":" + str(data_arr) + r"}"
-            data_ref.json_data = save_back
-            data_ref.save()
-
+        if modification == "REPLACE":
+            print(data_to_add)
+            print(data_ref.type_of_data)
+            valid, value_to_replace = utils.verify_data(data_to_add, data_ref.type_of_data)
+            if valid:
+                save_back = "{\"data_val\":" + str(value_to_replace) + r"}"
+                data_ref.json_data = save_back
+                data_ref.save()
+            else:
+                error_message = {'status': 'Error -> Invalid data format for requested insert.'}
+                return JsonResponse(error_message)
+        elif modification == "APPEND":
+            #Check if array to append.
+            if data_ref.type_of_data == "Integer_Arr" and utils.is_Integer(data_to_add):
+                json_data = json.loads(data_ref.json_data)
+                data_arr = json_data['data_val']
+                data_arr.pop(0)
+                data_arr.append(int(data_to_add))
+                save_back = "{\"data_val\":" + str(data_arr) + r"}"
+                data_ref.json_data = save_back
+                data_ref.save()
+            elif data_ref.type_of_data == "Double_Arr" and utils.is_Double(data_to_add):
+                json_data = json.loads(data_ref.json_data)
+                data_arr = json_data['data_val']
+                data_arr.pop(0)
+                data_arr.append(float(data_to_add))
+                save_back = "{\"data_val\":" + str(data_arr) + r"}"
+                data_ref.json_data = save_back
+                data_ref.save()
+            else:
+                error_message = {'status': 'Error -> Invalid data format for requested insert.'}
+                return JsonResponse(error_message)
+            
         print(data_ref.json_data)
-        
         return JsonResponse(success_message)
        
     else:

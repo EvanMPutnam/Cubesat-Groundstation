@@ -42,8 +42,11 @@ def create_project(project_name):
 
 import requests
 
-def stress_test(data_ref_name, data_ref_proejct, append_value):
-    src = "http://127.0.0.1:8000/master_view/api/append_data_to_array_maintain"
+APPEND_OP = "APPEND"
+REPLACE_OP = "REPLACE"
+
+def update_data(data_ref_name, data_ref_proejct, value_to_add, type_of_op = APPEND_OP):
+    src = "http://127.0.0.1:8000/master_view/api/modify_data"
     name = 'data_ref_name'
     project = 'data_ref_project'
     data_val = 'data_val'
@@ -52,13 +55,21 @@ def stress_test(data_ref_name, data_ref_proejct, append_value):
     
     data = {name: data_ref_name, 
             project: data_ref_proejct, 
-            data_val: append_value,
-            modification: "REPLACE"}
+            data_val: str(value_to_add),
+            modification: type_of_op}
 
     r = requests.get(src, params=data)
     print(r.content)
 
 
+import random
+import time
+
 # Create your tests here.
 if __name__ == "__main__":
-    stress_test('Altitude Data','Project_1', 20)
+    while True:
+        update_data('Airspeed Data','Project_1', random.randint(200, 400), REPLACE_OP)
+        update_data('Altitude Data','Project_1', random.randint(0, 100))
+        update_data('Some Other Graph','Project_1', random.randint(0, 100))
+        update_data('Some Other Data Field','Project_1', random.randint(0, 100))
+        time.sleep(10)
