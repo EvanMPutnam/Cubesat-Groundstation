@@ -1,3 +1,9 @@
+'''
+NOTE: This is VERY much still a work in progress.  
+This likely will not be done and finalized until the later stages of the project.
+
+'''
+
 import requests
 
 
