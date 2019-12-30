@@ -29,6 +29,7 @@ A dataref can hold the following types of data:
 - Double
 - Integer Array
 - Double Array
+
 The data is stored in a string json object in the field Json Data.  This was done for future expandability and to keep things simple.  Additionally it more or less allows for an array to exist inside sqlite database in a fairly efficient manner.
 
 ### Dataref Fields
