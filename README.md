@@ -11,9 +11,9 @@ Currently the app is just using the development server so you can type:
 
 ## About
 ![Image of Dataref project view](pictures/example.png)
-Most ground stations for rockets/satellites/or other smaller scale university projects are typically highly customized and limited in what can be changed.  A change to a piece of data means an update of the codebase to support that data field.  Additionally that 
+Most ground stations for rockets/satellites/or other smaller scale university projects are typically highly customized and limited in what can be changed.  A change to a piece of data means an update of the codebase to support that data field.
 
-To remedy some of these issues we came up with a ground station implementation that is meant to be generic enough that it can be used for any missions because the types of data that a given project has is defined by the administrator of the project.  They only need to create a new dataref.
+To remedy this we came up with a ground station implementation that is meant to be generic enough that it can be used for any missions because the types of data that a given project has is defined by the administrator of the project.  They only need to create a new dataref.
 
 ## Dataref
 This idea of a dataref, or data reference, is just a reference to some piece of data.  They are tied directly to a project and have unique names, although a different project can have a dataref of the same name as one in another project.
