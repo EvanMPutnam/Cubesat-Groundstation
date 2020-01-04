@@ -1,7 +1,7 @@
 # Kerbal Space Program Example
 This is an example of a potential project that the ground station could be used for.
 
-![Image of Kerbal Space program linked to board](../pictures/admin_panel.png)
+![Image of Kerbal Space program linked to board](../pictures/kerbal_example.png)
 
 ## Description
 This calls into the python api to update datarefs in the database.  The user can mimick something
