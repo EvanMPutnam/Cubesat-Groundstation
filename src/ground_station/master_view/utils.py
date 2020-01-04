@@ -8,10 +8,10 @@ def verify_data(data, data_type):
     data = data.replace("]", "")
     #Verify singular double
     if data_type == DOUBLE:
-        return is_Integer(data), str(data)
+        return is_Double(data), str(data)
     #Verify singular int
     elif data_type == INT:
-        return is_Double(data), str(data)
+        return is_Integer(data), str(data)
     #Verify double array
     elif data_type == DOUBLE_ARR:
         lst = data.split(',')

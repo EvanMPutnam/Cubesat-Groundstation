@@ -3,12 +3,20 @@ NOTE: This is VERY much still a work in progress.
 This likely will not be done and finalized until the later stages of the project.
 
 '''
-
+#For API Use
 import requests
+import random
+
+#For testing use.
+import time
 
 
 BASE_URL = r'http://127.0.0.1:8000/master_view/'
+UPDATE_DATAREF_SRC = "http://127.0.0.1:8000/master_view/api/modify_data"
 
+#Operation types for data manipulation
+APPEND_OP = "APPEND"
+REPLACE_OP = "REPLACE"
 
 
 #Method for creating datarefs (Current supported datarefs are int, int_arr, double, double_arr)
@@ -46,30 +54,28 @@ def create_project(project_name):
     print(r.content)
 
 
-import requests
 
-APPEND_OP = "APPEND"
-REPLACE_OP = "REPLACE"
 
-def update_data(data_ref_name, data_ref_proejct, value_to_add, type_of_op = APPEND_OP):
-    src = "http://127.0.0.1:8000/master_view/api/modify_data"
+def update_data(data_ref_name, data_ref_proejct, value_to_add, type_of_op = APPEND_OP, debug = False):
+    #Paremeter names in the database
     name = 'data_ref_name'
     project = 'data_ref_project'
     data_val = 'data_val'
     modification = 'modification'
     
-    
+    #Format the data to send
     data = {name: data_ref_name, 
             project: data_ref_proejct, 
             data_val: str(value_to_add),
             modification: type_of_op}
 
-    r = requests.get(src, params=data)
-    print(r.content)
+    #Send and print request
+    r = requests.get(UPDATE_DATAREF_SRC, params=data)
+    print(debug)
+    if debug:
+        print(r.content)
 
 
-import random
-import time
 
 # Create your tests here.
 if __name__ == "__main__":
