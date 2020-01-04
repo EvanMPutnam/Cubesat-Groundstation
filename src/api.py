@@ -71,7 +71,6 @@ def update_data(data_ref_name, data_ref_proejct, value_to_add, type_of_op = APPE
 
     #Send and print request
     r = requests.get(UPDATE_DATAREF_SRC, params=data)
-    print(debug)
     if debug:
         print(r.content)
 
